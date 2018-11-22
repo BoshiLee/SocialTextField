@@ -44,4 +44,17 @@ extension String {
     func removeHTMLTags() -> String {
         return self.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression, range: nil)
     }
+    
+    func int(of stringIndex: String.Index) -> Int {
+        return self.distance(from: self.startIndex, to: stringIndex)
+    }
+    
+    func rangeOfEndIndex(from stratIndex: String.Index) -> NSRange {
+        return NSRange(location: self.int(of: startIndex), length: self.int(of: self.endIndex))
+    }
+    
+    func isLastCharcter(is string: Character) -> Bool {
+        guard let lastString = self.last, lastString == string else { return false }
+        return true
+    }
 }

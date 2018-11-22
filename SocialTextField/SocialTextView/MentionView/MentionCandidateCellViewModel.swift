@@ -12,10 +12,12 @@ class MentionCandidateCellViewModel {
     
     let photoImageURL: URL
     let nickName: String
+    let id: String
     
-    init(photoImageURL: URL, nickName: String) {
+    init(photoImageURL: URL, nickName: String, id: String) {
         self.photoImageURL = photoImageURL
         self.nickName = nickName
+        self.id = id
     }
     
     func dequeue(_ tableView: UITableView, at indexPath: IndexPath) -> UITableViewCell {

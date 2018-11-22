@@ -26,7 +26,7 @@ final class MentionsTableViewController: UITableViewController {
 extension MentionsTableViewController: MentionsPresentable, Mentionable {
     
     func didGetMentions() {
-        
+        self.tableView.reloadData()
     }
     
 }

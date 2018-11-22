@@ -25,6 +25,7 @@
 		9F45496621A409EE005BAF23 /* MentionCandidateCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9F45496421A409EE005BAF23 /* MentionCandidateCell.xib */; };
 		9F45496821A4126B005BAF23 /* MentionCandidateCellViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F45496721A4126B005BAF23 /* MentionCandidateCellViewModel.swift */; };
 		9F45496A21A41686005BAF23 /* MentionsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F45496921A41686005BAF23 /* MentionsViewModel.swift */; };
+		9F5D482121A572D300083092 /* TextViewHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5D482021A572D300083092 /* TextViewHelper.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -48,6 +49,7 @@
 		9F45496421A409EE005BAF23 /* MentionCandidateCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MentionCandidateCell.xib; sourceTree = "<group>"; };
 		9F45496721A4126B005BAF23 /* MentionCandidateCellViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MentionCandidateCellViewModel.swift; sourceTree = "<group>"; };
 		9F45496921A41686005BAF23 /* MentionsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MentionsViewModel.swift; sourceTree = "<group>"; };
+		9F5D482021A572D300083092 /* TextViewHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextViewHelper.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -101,6 +103,7 @@
 			isa = PBXGroup;
 			children = (
 				9F16013321A3D740004023C6 /* SocialTextView.swift */,
+				9F5D482021A572D300083092 /* TextViewHelper.swift */,
 				9F16013B21A403A4004023C6 /* MentionView */,
 			);
 			path = SocialTextView;
@@ -201,6 +204,7 @@
 				9F45496A21A41686005BAF23 /* MentionsViewModel.swift in Sources */,
 				9F16013021A3BE34004023C6 /* NSRangeHelper.swift in Sources */,
 				9F16012C21A3ADB8004023C6 /* ElementBuilder.swift in Sources */,
+				9F5D482121A572D300083092 /* TextViewHelper.swift in Sources */,
 				9F16013221A3C9CB004023C6 /* StringEmojiHelper.swift in Sources */,
 				9F16012A21A3A8F4004023C6 /* SocialType.swift in Sources */,
 				9F16013621A3E074004023C6 /* SocialColor.swift in Sources */,

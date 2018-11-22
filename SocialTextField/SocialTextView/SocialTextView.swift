@@ -14,6 +14,7 @@ protocol Mentionable: AnyObject, UIPopoverPresentationControllerDelegate {
 
 protocol SocialTextViewDelegate: AnyObject {
     func shouldPresentMentionView(_ mentionViewController: MentionsTableViewController)
+    func shouldDismissMentionView()
 }
 
 class SocialTextView: UITextView {
@@ -81,15 +82,13 @@ class SocialTextView: UITextView {
         didSet { updateTextAttributed(parseText: false) }
     }
     
-    
     // MARK: - Private Properties don't open it
     private lazy var cachedSocialElements: [SocialElement] = [SocialElement]()
     private lazy var mentionDict: MentionDict = MentionDict()
     private var selectedElement: SocialElement?
     private var mentionTableViewController: MentionsTableViewController?
-    
-    
-    
+    private var isPopoverPresenting: Bool = false
+    private var lastMentionRange: NSRange?
     
     fileprivate var _customizing: Bool = true
 
@@ -110,30 +109,96 @@ class SocialTextView: UITextView {
         updateTextAttributed()
     }
     
-    open func setContent(_ text: String, mentions: [MentionUser]) {
+    open func setContent(mentions: [MentionUser]) {
         self.mentionDict.removeAll()
         for mention in mentions {
             mentionDict[mention.account] = mention
         }
-        self.originText = text
+        self.originText = self.text
+
+        guard !self.isTypingChineseAlpahbet() else { return }
+        self.popoverHandler(text: originText)
         self.updateTextAttributed()
     }
     
-    func setupPopoverMentionView<T: Mentionable>(from viewController: T, withSize size: CGSize) {
+    fileprivate func isTypingChineseAlpahbet() -> Bool {
+        guard let aString = self.text else { return true }
+        let selectedRange: UITextRange? = self.markedTextRange
+        // 獲取被選取的文字區域（在打注音時，還沒選字以前注音會被選起來）
+        guard selectedRange == nil else { return true}
+        guard !aString.isEmpty, aString != "" else { return true }
+        return false
+    }
+    
+}
+
+// MARK: - Popover Handler
+extension SocialTextView: Mentionable {
+    
+    fileprivate func setupPopoverMentionView() {
         if self.mentionTableViewController == nil {
             self.mentionTableViewController = MentionsTableViewController()
         }
         mentionTableViewController?.modalPresentationStyle = .popover
-        mentionTableViewController?.popoverPresentationController?.delegate = viewController
+        mentionTableViewController?.popoverPresentationController?.delegate = self
         guard let popover = mentionTableViewController?.popoverPresentationController else { return }
         popover.sourceView = self
         // the position of the popover where it's showed
-        popover.sourceRect = self.bounds
+        let sourceRect = CGRect(x: bounds.minX, y: bounds.maxY, width: bounds.size.width * 0.95, height: bounds.size.height * 0.4)
+        popover.sourceRect = sourceRect
         // the size you want to display
-        mentionTableViewController?.preferredContentSize = size
-        
-//        self.socialDelegate?.shouldPresentMentionView(self.mentionTableViewController!)
+        mentionTableViewController?.preferredContentSize = sourceRect.size
+
     }
+    
+    private func popoverHandler(text: String) {
+        if text.isLastCharcter(is: "@") {
+            if let lastMentionLocation = self.lastMentionRange?.location { //判斷是否已有 ＠
+                self.lastMentionRange = NSRange(location: lastMentionLocation, length: text.int(of: text.endIndex))
+            } else { // 沒有 ＠ 新增一個 range, 跳 popover
+                self.lastMentionRange = NSRange(location: text.int(of: text.endIndex), length: 0)
+                self.presentPopover()
+            }
+
+        } else if self.isAfterMention() {
+            if let lastMentionLocation = self.lastMentionRange?.location {
+                self.lastMentionRange = NSRange(location: lastMentionLocation, length: text.int(of: text.endIndex))
+            }
+            self.presentPopover()
+        } else {
+            self.lastMentionRange = nil
+            self.isPopoverPresenting = false
+            self.socialDelegate?.shouldDismissMentionView()
+        }
+        
+    }
+    
+    private func isAfterMention() -> Bool {
+        // 確定是否在 mention 後面
+        guard let lastMentionRange = self.lastMentionRange else { return false }
+        return self.getCusorPosition() > lastMentionRange.location
+    }
+    
+    private func presentPopover() {
+        guard !self.isPopoverPresenting else { return }
+        self.setupPopoverMentionView()
+        self.socialDelegate?.shouldPresentMentionView(self.mentionTableViewController!)
+        self.isPopoverPresenting = true
+    }
+    
+    // MARK: - Popover delegates
+    func adaptivePresentationStyle(for controller: UIPresentationController, traitCollection: UITraitCollection) -> UIModalPresentationStyle {
+        return .none
+    }
+    
+    func popoverPresentationControllerDidDismissPopover(_ popoverPresentationController: UIPopoverPresentationController) {
+        self.isPopoverPresenting = false
+    }
+
+}
+
+// MARK: - Attributed String Handler
+extension SocialTextView {
     
     fileprivate func updateTextAttributed(parseText: Bool = true) {
         // clean up previous active elements
@@ -143,9 +208,8 @@ class SocialTextView: UITextView {
             let newString = parseTextAndExtractActiveElements(mutAttrString)
             mutAttrString.mutableString.setString(newString)
         }
-
         self.addLinkAttribute(mutAttrString, with: self.cachedSocialElements)
-        text = mutAttrString.string
+        self.text = mutAttrString.string
         self.textStorage.setAttributedString(mutAttrString)
         setNeedsDisplay()
     }
@@ -154,7 +218,7 @@ class SocialTextView: UITextView {
         self.selectedElement = nil
         self.cachedSocialElements.removeAll()
     }
-
+    
     /// use regex check all link ranges
     fileprivate func parseTextAndExtractActiveElements(_ attrString: NSAttributedString) -> String {
         var textString = attrString.string
@@ -166,17 +230,17 @@ class SocialTextView: UITextView {
         return textString
     }
     
-    func removeAllAttribute(_ mutAttrString: NSMutableAttributedString) {
+    fileprivate func removeAllAttribute(_ mutAttrString: NSMutableAttributedString) {
         let range = NSRange(location: 0, length: mutAttrString.length)
         var attributes = [NSAttributedString.Key : Any]()
-
+        
         // 保持原本在 storyboard 的顏色字體設定
         attributes[.font] = self.regularFont
         attributes[.foregroundColor] = self.regularColor
         mutAttrString.setAttributes(attributes, range: range)
     }
     
-    private func addLinkAttribute(_ mutAttrString: NSMutableAttributedString, with elements: [SocialElement]) {
+    fileprivate func addLinkAttribute(_ mutAttrString: NSMutableAttributedString, with elements: [SocialElement]) {
         self.removeAllAttribute(mutAttrString)
         // 針對各個元素的顏色字體設定
         for element in elements {
@@ -196,7 +260,7 @@ class SocialTextView: UITextView {
         }
     }
     
-    private func createAttributes(with socialType: SocialType) -> [NSAttributedString.Key : Any] {
+    fileprivate func createAttributes(with socialType: SocialType) -> [NSAttributedString.Key : Any] {
         var attributes = [NSAttributedString.Key : Any]()
         switch socialType {
         case .mention:
@@ -217,5 +281,4 @@ class SocialTextView: UITextView {
         }
         return attributes
     }
-    
 }

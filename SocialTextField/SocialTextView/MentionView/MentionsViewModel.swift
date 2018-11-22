@@ -20,6 +20,8 @@ class MentionsViewModel: NSObject {
     
     init(presenter: MentionsPresentable) {
         self.presenter = presenter
+        
+        super.init()
     }
     
     func searchMentions(by keyword: String) {
