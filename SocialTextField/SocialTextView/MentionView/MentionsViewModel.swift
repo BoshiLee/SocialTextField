@@ -25,12 +25,13 @@ class MentionsViewModel: NSObject {
     }
     
     func searchMentions(by keyword: String) {
-        
+        self.cellViewModels.append(MentionCandidateCellViewModel(photoImageURL: URL(string: "http://123.com")!, nickName: "Boshi Li", id: "boshilee"))
+        self.presenter.didGetMentions()
     }
     
 }
 
-extension MentionsViewModel: UITableViewDataSource {
+extension MentionsViewModel: UITableViewDataSource, UITableViewDelegate {
     // MARK: - Table view data source
     
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -42,7 +43,12 @@ extension MentionsViewModel: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = self.cellViewModels[indexPath.row].dequeue(tableView, at: indexPath)
+        let cell = self.cellViewModels[indexPath.row].cellInstance(cell: MentionCandidateCell.self, tableView: tableView, atIndexPath: indexPath)
+        cell.configure(withViewModel: self.cellViewModels[indexPath.row])
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        <#code#>
     }
 }

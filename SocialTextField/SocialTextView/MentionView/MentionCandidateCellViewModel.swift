@@ -8,7 +8,7 @@
 
 import UIKit
 
-class MentionCandidateCellViewModel {
+class MentionCandidateCellViewModel: TableCellViewModelProtocol {
     
     let photoImageURL: URL
     let nickName: String

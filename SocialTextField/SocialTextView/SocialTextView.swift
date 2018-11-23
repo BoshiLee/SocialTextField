@@ -8,13 +8,19 @@
 
 import UIKit
 
-protocol Mentionable: AnyObject, UIPopoverPresentationControllerDelegate {
-    
+protocol SocialTextViewDelegate: AnyObject {
+    var mentionPopoverWindow: MentionWindow? { get set }
+    func shouldPresentMentionView()
+    func shouldDismissMentionView()
 }
 
-protocol SocialTextViewDelegate: AnyObject {
-    func shouldPresentMentionView(_ mentionViewController: MentionsTableViewController)
-    func shouldDismissMentionView()
+extension SocialTextViewDelegate {
+    func shouldPresentMentionView() {
+        self.mentionPopoverWindow?.isHidden = false
+    }
+    func shouldDismissMentionView() {
+        self.mentionPopoverWindow?.isHidden = true
+    }
 }
 
 class SocialTextView: UITextView {
@@ -86,6 +92,9 @@ class SocialTextView: UITextView {
     private lazy var cachedSocialElements: [SocialElement] = [SocialElement]()
     private lazy var mentionDict: MentionDict = MentionDict()
     private var selectedElement: SocialElement?
+    
+    // MARK: - Popover related properties
+    private var mentionView: UIView?
     private var mentionTableViewController: MentionsTableViewController?
     private var isPopoverPresenting: Bool = false
     private var lastMentionRange: NSRange?
@@ -102,6 +111,7 @@ class SocialTextView: UITextView {
     required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         _customizing = false
+        self.keyboardType = .twitter
     }
     
     open override func awakeFromNib() {
@@ -126,76 +136,61 @@ class SocialTextView: UITextView {
         let selectedRange: UITextRange? = self.markedTextRange
         // 獲取被選取的文字區域（在打注音時，還沒選字以前注音會被選起來）
         guard selectedRange == nil else { return true}
-        guard !aString.isEmpty, aString != "" else { return true }
+        guard !aString.isEmpty, aString != "" else {
+            self.lastMentionRange = nil
+            self.dismissPopover()
+            return true
+        }
         return false
     }
     
 }
 
 // MARK: - Popover Handler
-extension SocialTextView: Mentionable {
-    
-    fileprivate func setupPopoverMentionView() {
-        if self.mentionTableViewController == nil {
-            self.mentionTableViewController = MentionsTableViewController()
-        }
-        mentionTableViewController?.modalPresentationStyle = .popover
-        mentionTableViewController?.popoverPresentationController?.delegate = self
-        guard let popover = mentionTableViewController?.popoverPresentationController else { return }
-        popover.sourceView = self
-        // the position of the popover where it's showed
-        let sourceRect = CGRect(x: bounds.minX, y: bounds.maxY, width: bounds.size.width * 0.95, height: bounds.size.height * 0.4)
-        popover.sourceRect = sourceRect
-        // the size you want to display
-        mentionTableViewController?.preferredContentSize = sourceRect.size
-
-    }
+extension SocialTextView {
     
     private func popoverHandler(text: String) {
-        if text.isLastCharcter(is: "@") {
+
+        if self.isCurrentTyping(is: "@") {
             if let lastMentionLocation = self.lastMentionRange?.location { //判斷是否已有 ＠
-                self.lastMentionRange = NSRange(location: lastMentionLocation, length: text.int(of: text.endIndex))
+                self.lastMentionRange = NSRange(location: lastMentionLocation, length: self.getCurrentTypingLocation())
             } else { // 沒有 ＠ 新增一個 range, 跳 popover
-                self.lastMentionRange = NSRange(location: text.int(of: text.endIndex), length: 0)
+                self.lastMentionRange = NSRange(location: self.getCurrentTypingLocation(), length: 0)
                 self.presentPopover()
+                self.socialDelegate?.mentionPopoverWindow?.searchMention(by: "@")
             }
 
-        } else if self.isAfterMention() {
+        } else if self.isTypingAfterMention() {
             if let lastMentionLocation = self.lastMentionRange?.location {
-                self.lastMentionRange = NSRange(location: lastMentionLocation, length: text.int(of: text.endIndex))
+                let length = self.getCurrentTypingLocation() - lastMentionLocation > 0 ? self.getCurrentTypingLocation() - lastMentionLocation : 0
+                self.lastMentionRange = NSRange(location: lastMentionLocation, length: length)
             }
             self.presentPopover()
         } else {
             self.lastMentionRange = nil
-            self.isPopoverPresenting = false
-            self.socialDelegate?.shouldDismissMentionView()
+            self.dismissPopover()
         }
-        
     }
     
-    private func isAfterMention() -> Bool {
+    private func isTypingAfterMention() -> Bool {
         // 確定是否在 mention 後面
         guard let lastMentionRange = self.lastMentionRange else { return false }
-        return self.getCusorPosition() > lastMentionRange.location
+        return self.getCurrentTypingLocation() > lastMentionRange.location
     }
     
     private func presentPopover() {
         guard !self.isPopoverPresenting else { return }
-        self.setupPopoverMentionView()
-        self.socialDelegate?.shouldPresentMentionView(self.mentionTableViewController!)
+        self.socialDelegate?.shouldPresentMentionView()
         self.isPopoverPresenting = true
     }
     
-    // MARK: - Popover delegates
-    func adaptivePresentationStyle(for controller: UIPresentationController, traitCollection: UITraitCollection) -> UIModalPresentationStyle {
-        return .none
-    }
-    
-    func popoverPresentationControllerDidDismissPopover(_ popoverPresentationController: UIPopoverPresentationController) {
+    private func dismissPopover() {
+        self.socialDelegate?.shouldDismissMentionView()
         self.isPopoverPresenting = false
     }
-
+    
 }
+
 
 // MARK: - Attributed String Handler
 extension SocialTextView {
@@ -282,3 +277,5 @@ extension SocialTextView {
         return attributes
     }
 }
+
+

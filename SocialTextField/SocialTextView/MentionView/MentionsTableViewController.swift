@@ -8,13 +8,16 @@
 
 import UIKit
 
-final class MentionsTableViewController: UITableViewController {
+final class MentionsTableViewController: UIViewController  {
+    
+    @IBOutlet weak var tableView: UITableView!
     
     private lazy var viewModel: MentionsViewModel = MentionsViewModel(presenter: self)
-        
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.tableView.dataSource = self.viewModel
+        tableView.estimatedSectionHeaderHeight = 0
     }
     
     func searchMentions(by keyword: String) {
@@ -23,10 +26,9 @@ final class MentionsTableViewController: UITableViewController {
     
 }
 
-extension MentionsTableViewController: MentionsPresentable, Mentionable {
+extension MentionsTableViewController: MentionsPresentable {
     
     func didGetMentions() {
         self.tableView.reloadData()
     }
-    
 }

@@ -8,8 +8,11 @@
 
 import UIKit
 
-class ViewController: UIViewController, UITextViewDelegate, Mentionable {
-
+class ViewController: UIViewController, UITextViewDelegate {
+    
+    var mentionPopoverWindow: MentionWindow?
+    
+    
     @IBOutlet weak var socialTextView: SocialTextView! {
         didSet {
             let activeFont = UIFont.boldSystemFont(ofSize: 14.0)
@@ -28,25 +31,40 @@ class ViewController: UIViewController, UITextViewDelegate, Mentionable {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // setup popover
-
+        
     }
-
-
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        self.setMentionPopoverWindow()
+    }
+    
     func textViewDidChange(_ textView: UITextView) {
         self.socialTextView.setContent(mentions: [])
+    }
+    
+    func setMentionPopoverWindow() {
+        let textViewBounds = self.socialTextView.frame
+        let size = CGSize(width: textViewBounds.width * 0.95,
+                          height: textViewBounds.height * 0.5)
+        self.mentionPopoverWindow = MentionWindow (
+            frame: CGRect(
+                x: textViewBounds.minX + ((self.socialTextView.bounds.width - size.width) / 2),
+                y: textViewBounds.midY,
+                width: size.width,
+                height: size.height
+            )
+        )
     }
     
 }
 
 extension ViewController: SocialTextViewDelegate {
-    func shouldDismissMentionView() {
-        self.presentedViewController?.dismiss(animated: true, completion: nil)
-    }
     
-    func shouldPresentMentionView(_ mentionViewController: MentionsTableViewController) {
-        self.present(mentionViewController, animated: true, completion: nil)
-    }
+    
+    
+    
+
     
     
 }

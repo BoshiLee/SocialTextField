@@ -57,4 +57,5 @@ extension String {
         guard let lastString = self.last, lastString == string else { return false }
         return true
     }
+    
 }
