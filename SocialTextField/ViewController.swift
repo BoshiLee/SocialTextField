@@ -25,7 +25,6 @@ class ViewController: UIViewController, UITextViewDelegate {
             self.socialTextView.URLFont = activeFont
             self.socialTextView.mentionColor = .tagBlue
             self.socialTextView.mentionFont = activeFont
-            self.socialTextView.socialDelegate = self
         }
     }
     
@@ -44,28 +43,17 @@ class ViewController: UIViewController, UITextViewDelegate {
     }
     
     func setMentionPopoverWindow() {
+        
         let textViewBounds = self.socialTextView.frame
         let size = CGSize(width: textViewBounds.width * 0.95,
                           height: textViewBounds.height * 0.5)
-        self.mentionPopoverWindow = MentionWindow (
-            frame: CGRect(
+        let frame = CGRect(
                 x: textViewBounds.minX + ((self.socialTextView.bounds.width - size.width) / 2),
                 y: textViewBounds.midY,
                 width: size.width,
                 height: size.height
-            )
         )
+        self.socialTextView.setMentionPopoverWindow(with: frame)
     }
     
 }
-
-extension ViewController: SocialTextViewDelegate {
-    
-    
-    
-    
-
-    
-    
-}
-

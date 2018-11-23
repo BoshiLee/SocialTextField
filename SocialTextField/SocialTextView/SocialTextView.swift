@@ -8,21 +8,6 @@
 
 import UIKit
 
-protocol SocialTextViewDelegate: AnyObject {
-    var mentionPopoverWindow: MentionWindow? { get set }
-    func shouldPresentMentionView()
-    func shouldDismissMentionView()
-}
-
-extension SocialTextViewDelegate {
-    func shouldPresentMentionView() {
-        self.mentionPopoverWindow?.isHidden = false
-    }
-    func shouldDismissMentionView() {
-        self.mentionPopoverWindow?.isHidden = true
-    }
-}
-
 class SocialTextView: UITextView {
 
     // MARK: - override UILabel properties
@@ -96,13 +81,11 @@ class SocialTextView: UITextView {
     // MARK: - Popover related properties
     private var isPopoverPresenting: Bool = false
     private var lastMentionRange: NSRange?
-    
+    private var mentionPopoverWindow: MentionWindow?
     fileprivate var _customizing: Bool = true
 
     // MARK: - Public properties
     open var enableType: [SocialType] = [.mention, .hashtag, .url]
-    open weak var socialDelegate: SocialTextViewDelegate?
-    
     open var originText: String = ""
     open var prensentingText: String = ""
     
@@ -155,7 +138,7 @@ extension SocialTextView {
             } else { // 沒有 ＠ 新增一個 range, 跳 popover
                 self.lastMentionRange = NSRange(location: self.getCurrentTypingLocation(), length: 1)
                 self.presentPopover()
-                self.socialDelegate?.mentionPopoverWindow?.searchMention(by: nil)
+                self.mentionPopoverWindow?.searchMention(by: nil)
             }
 
         } else if self.isTypingAfterMention() {
@@ -163,7 +146,7 @@ extension SocialTextView {
                 let newMentionLength = self.getCurrentTypingLocation() - lastMention.location + 1
                 let length = newMentionLength > 0 ? newMentionLength : 0
                 self.lastMentionRange = NSRange(location: lastMention.location, length: length)
-                self.socialDelegate?.mentionPopoverWindow?.searchMention(by: text.subString(with: lastMentionRange!))
+                self.mentionPopoverWindow?.searchMention(by: text.subString(with: lastMentionRange!))
             }
             self.presentPopover()
             
@@ -181,13 +164,18 @@ extension SocialTextView {
     
     private func presentPopover() {
         guard !self.isPopoverPresenting else { return }
-        self.socialDelegate?.shouldPresentMentionView()
+        self.mentionPopoverWindow?.isHidden = false
         self.isPopoverPresenting = true
     }
     
     private func dismissPopover() {
-        self.socialDelegate?.shouldDismissMentionView()
+        self.mentionPopoverWindow?.isHidden = true
         self.isPopoverPresenting = false
+    }
+    
+    open func setMentionPopoverWindow(with frame: CGRect) {
+        self.mentionPopoverWindow = MentionWindow(frame: frame)
+        
     }
     
 }

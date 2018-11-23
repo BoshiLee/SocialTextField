@@ -26,7 +26,7 @@ class MentionsViewModel: NSObject {
     }
     
     func searchMentions(by keyword: String?) {
-        print(keyword)
+        
         self.cellViewModels.append(MentionCandidateCellViewModel(photoImageURL: URL(string: "http://123.com")!, nickName: "Boshi Li", id: "boshilee"))
         self.presenter.didGetMentions()
     }
@@ -51,6 +51,12 @@ extension MentionsViewModel: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        
+        let cellVM = self.cellViewModels[indexPath.row]
+        let metion = MentionUser(
+            account: cellVM.id,
+            nickName: cellVM.nickName,
+            shouldActiveInt: 1
+        )
+        self.presenter.didSelectedMention(metion)
     }
 }
