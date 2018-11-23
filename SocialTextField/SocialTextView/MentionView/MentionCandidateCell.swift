@@ -14,7 +14,6 @@ class MentionCandidateCell: UITableViewCell {
     @IBOutlet weak var nickNameLabel: UILabel!
     
     func configure(withViewModel viewModel: MentionCandidateCellViewModel) {
-        
         self.nickNameLabel.text = viewModel.nickName
     }
     

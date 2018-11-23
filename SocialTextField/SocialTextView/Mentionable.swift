@@ -8,13 +8,20 @@
 
 import UIKit
 
+protocol MentionWindowDelegate: AnyObject {
+    func didSelectedMention(_ mention: MentionUser)
+}
+
 class MentionWindow: UIWindow {
+    
+    weak var delegate: MentionWindowDelegate?
     
     lazy var mentionViewModel: MentionsViewModel = MentionsViewModel(presenter: self)
     var tableView: UITableView!
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        self.setupTableView()
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -31,12 +38,16 @@ class MentionWindow: UIWindow {
 
     }
     
-    func searchMention(by keyword: String) {
+    func searchMention(by keyword: String?) {
         self.mentionViewModel.searchMentions(by: keyword)
     }
 }
 
 extension MentionWindow: MentionsPresentable {
+    func didSelectedMention(_ mention: MentionUser) {
+        self.delegate?.didSelectedMention(mention)
+    }
+    
     func didGetMentions() {
         self.tableView.reloadData()
     }

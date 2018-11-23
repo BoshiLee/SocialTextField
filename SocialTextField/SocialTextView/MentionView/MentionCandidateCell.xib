@@ -20,7 +20,7 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="JXP-dv-M8q">
-                        <rect key="frame" x="20" y="6" width="32" height="32"/>
+                        <rect key="frame" x="8" y="6" width="32" height="32"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="gfR-Pc-b9s">
                                 <rect key="frame" x="1.5" y="1.5" width="29" height="28.5"/>
@@ -50,7 +50,7 @@
                         </userDefinedRuntimeAttributes>
                     </view>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="249" text="NickName" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Egj-Fm-LpL">
-                        <rect key="frame" x="60" y="12.5" width="240" height="18.5"/>
+                        <rect key="frame" x="48" y="12.5" width="252" height="18.5"/>
                         <fontDescription key="fontDescription" name="PingFangTC-Medium" family="PingFang TC" pointSize="13"/>
                         <color key="textColor" red="0.20392156859999999" green="0.20392156859999999" blue="0.20392156859999999" alpha="1" colorSpace="calibratedRGB"/>
                         <nil key="highlightedColor"/>
@@ -60,7 +60,7 @@
                     <constraint firstItem="Egj-Fm-LpL" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="90X-jZ-hXG"/>
                     <constraint firstItem="JXP-dv-M8q" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="BEa-o1-95H"/>
                     <constraint firstItem="Egj-Fm-LpL" firstAttribute="leading" secondItem="JXP-dv-M8q" secondAttribute="trailing" constant="8" symbolic="YES" id="EHJ-hi-PR7"/>
-                    <constraint firstItem="JXP-dv-M8q" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="20" symbolic="YES" id="GVm-uR-BqA"/>
+                    <constraint firstItem="JXP-dv-M8q" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="8" id="GVm-uR-BqA"/>
                     <constraint firstAttribute="trailing" secondItem="Egj-Fm-LpL" secondAttribute="trailing" constant="20" symbolic="YES" id="TLd-bL-tyK"/>
                 </constraints>
             </tableViewCellContentView>

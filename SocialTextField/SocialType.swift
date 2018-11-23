@@ -25,7 +25,25 @@ public enum SocialType {
     }
 }
 
-struct MentionUser: Codable{
+struct MentionCandidate: Codable {
+    let account: String
+    let nickName: String
+    let profileImageURLString: String
+    
+    enum CodingKeys: String, CodingKey {
+        case account
+        case nickName
+        case profileImageURLString = "profileImg"
+    }
+}
+
+extension MentionCandidate {
+    var profileImageURL: URL? {
+        return URL(string: self.profileImageURLString)
+    }
+}
+
+struct MentionUser: Codable {
     let account: String
     let nickName: String
     let shouldActiveInt: Int

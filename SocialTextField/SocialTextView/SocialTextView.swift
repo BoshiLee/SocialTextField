@@ -94,8 +94,6 @@ class SocialTextView: UITextView {
     private var selectedElement: SocialElement?
     
     // MARK: - Popover related properties
-    private var mentionView: UIView?
-    private var mentionTableViewController: MentionsTableViewController?
     private var isPopoverPresenting: Bool = false
     private var lastMentionRange: NSRange?
     
@@ -150,22 +148,25 @@ class SocialTextView: UITextView {
 extension SocialTextView {
     
     private func popoverHandler(text: String) {
-
+//        print(getCurrentTypingCharacter(), self.getCursorPosition())
         if self.isCurrentTyping(is: "@") {
             if let lastMentionLocation = self.lastMentionRange?.location { //判斷是否已有 ＠
                 self.lastMentionRange = NSRange(location: lastMentionLocation, length: self.getCurrentTypingLocation())
             } else { // 沒有 ＠ 新增一個 range, 跳 popover
-                self.lastMentionRange = NSRange(location: self.getCurrentTypingLocation(), length: 0)
+                self.lastMentionRange = NSRange(location: self.getCurrentTypingLocation(), length: 1)
                 self.presentPopover()
-                self.socialDelegate?.mentionPopoverWindow?.searchMention(by: "@")
+                self.socialDelegate?.mentionPopoverWindow?.searchMention(by: nil)
             }
 
         } else if self.isTypingAfterMention() {
-            if let lastMentionLocation = self.lastMentionRange?.location {
-                let length = self.getCurrentTypingLocation() - lastMentionLocation > 0 ? self.getCurrentTypingLocation() - lastMentionLocation : 0
-                self.lastMentionRange = NSRange(location: lastMentionLocation, length: length)
+            if let lastMention = self.lastMentionRange {
+                let newMentionLength = self.getCurrentTypingLocation() - lastMention.location + 1
+                let length = newMentionLength > 0 ? newMentionLength : 0
+                self.lastMentionRange = NSRange(location: lastMention.location, length: length)
+                self.socialDelegate?.mentionPopoverWindow?.searchMention(by: text.subString(with: lastMentionRange!))
             }
             self.presentPopover()
+            
         } else {
             self.lastMentionRange = nil
             self.dismissPopover()

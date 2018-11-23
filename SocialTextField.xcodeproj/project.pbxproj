@@ -22,8 +22,6 @@
 		9F18E54021A694A2006BEFC1 /* StringHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F18E53F21A694A2006BEFC1 /* StringHelper.swift */; };
 		9F18E54421A6A999006BEFC1 /* Mentionable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F18E54321A6A999006BEFC1 /* Mentionable.swift */; };
 		9F18E54621A6FC9E006BEFC1 /* UITableViewHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F18E54521A6FC9D006BEFC1 /* UITableViewHelper.swift */; };
-		9F18E54A21A79E00006BEFC1 /* MentionsTableViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9F18E54821A79E00006BEFC1 /* MentionsTableViewController.xib */; };
-		9F45496121A40978005BAF23 /* MentionsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F45495F21A40978005BAF23 /* MentionsTableViewController.swift */; };
 		9F45496521A409EE005BAF23 /* MentionCandidateCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F45496321A409EE005BAF23 /* MentionCandidateCell.swift */; };
 		9F45496621A409EE005BAF23 /* MentionCandidateCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9F45496421A409EE005BAF23 /* MentionCandidateCell.xib */; };
 		9F45496821A4126B005BAF23 /* MentionCandidateCellViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F45496721A4126B005BAF23 /* MentionCandidateCellViewModel.swift */; };
@@ -49,8 +47,6 @@
 		9F18E53F21A694A2006BEFC1 /* StringHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringHelper.swift; sourceTree = "<group>"; };
 		9F18E54321A6A999006BEFC1 /* Mentionable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mentionable.swift; sourceTree = "<group>"; };
 		9F18E54521A6FC9D006BEFC1 /* UITableViewHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UITableViewHelper.swift; sourceTree = "<group>"; };
-		9F18E54821A79E00006BEFC1 /* MentionsTableViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MentionsTableViewController.xib; sourceTree = "<group>"; };
-		9F45495F21A40978005BAF23 /* MentionsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MentionsTableViewController.swift; sourceTree = "<group>"; };
 		9F45496321A409EE005BAF23 /* MentionCandidateCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MentionCandidateCell.swift; sourceTree = "<group>"; };
 		9F45496421A409EE005BAF23 /* MentionCandidateCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MentionCandidateCell.xib; sourceTree = "<group>"; };
 		9F45496721A4126B005BAF23 /* MentionCandidateCellViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MentionCandidateCellViewModel.swift; sourceTree = "<group>"; };
@@ -121,8 +117,6 @@
 		9F16013B21A403A4004023C6 /* MentionView */ = {
 			isa = PBXGroup;
 			children = (
-				9F18E54821A79E00006BEFC1 /* MentionsTableViewController.xib */,
-				9F45495F21A40978005BAF23 /* MentionsTableViewController.swift */,
 				9F45496921A41686005BAF23 /* MentionsViewModel.swift */,
 				9F45496321A409EE005BAF23 /* MentionCandidateCell.swift */,
 				9F45496721A4126B005BAF23 /* MentionCandidateCellViewModel.swift */,
@@ -192,7 +186,6 @@
 				9F16011D21A2B333004023C6 /* LaunchScreen.storyboard in Resources */,
 				9F16011A21A2B333004023C6 /* Assets.xcassets in Resources */,
 				9F45496621A409EE005BAF23 /* MentionCandidateCell.xib in Resources */,
-				9F18E54A21A79E00006BEFC1 /* MentionsTableViewController.xib in Resources */,
 				9F16011821A2B331004023C6 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -220,7 +213,6 @@
 				9F16012A21A3A8F4004023C6 /* SocialType.swift in Sources */,
 				9F16013621A3E074004023C6 /* SocialColor.swift in Sources */,
 				9F18E54621A6FC9E006BEFC1 /* UITableViewHelper.swift in Sources */,
-				9F45496121A40978005BAF23 /* MentionsTableViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -10,6 +10,7 @@ import UIKit
 
 protocol MentionsPresentable: AnyObject {
     func didGetMentions()
+    func didSelectedMention(_ mention: MentionUser)
 }
 
 class MentionsViewModel: NSObject {
@@ -24,7 +25,8 @@ class MentionsViewModel: NSObject {
         super.init()
     }
     
-    func searchMentions(by keyword: String) {
+    func searchMentions(by keyword: String?) {
+        print(keyword)
         self.cellViewModels.append(MentionCandidateCellViewModel(photoImageURL: URL(string: "http://123.com")!, nickName: "Boshi Li", id: "boshilee"))
         self.presenter.didGetMentions()
     }
@@ -49,6 +51,6 @@ extension MentionsViewModel: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        <#code#>
+        
     }
 }
