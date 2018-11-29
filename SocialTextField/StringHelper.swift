@@ -13,13 +13,17 @@ import Foundation
 //someString[10...12]
 //someString[10...].string
 extension String {
-    
-    private func index(at offset: Int, from start: Index? = nil) -> Index? {
-        return index(start ?? startIndex, offsetBy: offset, limitedBy: endIndex)
+    mutating func insert<S>(_ s: S, at index: Int) where S : Collection, S.Element == Character {
+        precondition(index >= 0, "index can't be negative")
+        guard let stringIndex = self.index(at: index) else { return }
+        self.insert(contentsOf: s, at: stringIndex)
+    }
+    func index(at offset: Int, from start: Index? = nil) -> Index? {
+        return index(start ?? self.startIndex, offsetBy: offset, limitedBy: endIndex)
     }
     func character(at offset: Int) -> Character? {
         precondition(offset >= 0, "offset can't be negative")
-        guard let index = index(at: offset) else { return nil }
+        guard let index = index(at: offset), !self.isEmpty else { return nil }
         return self[index]
     }
     subscript(_ range: CountableRange<Int>) -> Substring {

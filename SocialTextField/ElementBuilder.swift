@@ -51,7 +51,7 @@ struct ElementBuilder {
         return newElements
     }
     
-    private static func replaceFirstMention(form text: inout String, with mentionDict: MentionDict) -> SocialElement? {
+    static func replaceFirstMention(form text: inout String, with mentionDict: MentionDict) -> SocialElement? {
         var originText = text
         guard let fristMention = self.matchesFirstMention(form: originText) else { return nil }
         guard let fristMentionRange = originText.range(from: fristMention) else { return nil }

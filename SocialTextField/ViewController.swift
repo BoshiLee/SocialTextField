@@ -17,7 +17,6 @@ class ViewController: UIViewController, UITextViewDelegate {
         didSet {
             let activeFont = UIFont.boldSystemFont(ofSize: 14.0)
             self.socialTextView.regularFont = activeFont
-            self.socialTextView.delegate = self
             self.socialTextView.hashtagColor = .tagBlue
             self.socialTextView.hashtagFont = activeFont
             self.socialTextView.URLColor = .textBlack
@@ -37,10 +36,7 @@ class ViewController: UIViewController, UITextViewDelegate {
         super.viewDidAppear(animated)
         self.setMentionPopoverWindow()
     }
-    
-    func textViewDidChange(_ textView: UITextView) {
-        self.socialTextView.setContent(mentions: [])
-    }
+
     
     func setMentionPopoverWindow() {
         

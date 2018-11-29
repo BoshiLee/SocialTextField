@@ -42,6 +42,7 @@ extension SocialTextView {
     }
     
     func getCurrentTypingCharacter() -> String? {
+        
         guard let current = text.character(at: self.getCurrentTypingLocation() ) else { return nil }
         return String(current)
     }
@@ -49,6 +50,34 @@ extension SocialTextView {
     func isCurrentTyping(is string: String) -> Bool {
         guard let current = self.getCurrentTypingCharacter(), current == string else { return false }
         return true
+    }
+    
+    func isTypingChineseAlpahbet() -> Bool {
+        
+        //没有高亮选择的字，则对已输入的文字进行字数统计和限制
+        print(self.markedTextRange != nil, self.selectedTextRange != nil)
+        
+        ///取得當前TextField選取的文字區域
+        return self.markedTextRange != nil
+    }
+    
+    func typingMarkedRange() -> NSRange? {
+        let beginning = self.beginningOfDocument
+        if let selectedRange = self.markedTextRange {
+            ///取得選取文字區域的開始點
+            let selectionStart = selectedRange.start
+            ///取得選取文字區域的結束點
+            let selectionEnd = selectedRange.end
+            ///取得TextField文案的開始點到選擇文字區域的開始點的字數
+            let startPosition = self.offset(from: beginning, to: selectionStart)
+            ///取得TextField文案的開始點到選擇文字區域的結束點的字數
+            let endPosition = self.offset(from: beginning, to: selectionEnd)
+            ///印出結果
+            print("start = \(startPosition), end = \(endPosition)")
+            return NSRange(location: startPosition, length: endPosition - startPosition)
+        } else {
+            return nil
+        }
     }
 
 }
