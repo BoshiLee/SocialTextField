@@ -26,24 +26,60 @@ extension String {
         guard let index = index(at: offset), !self.isEmpty else { return nil }
         return self[index]
     }
-    subscript(_ range: CountableRange<Int>) -> Substring {
-        precondition(range.lowerBound >= 0, "lowerBound can't be negative")
-        let start = index(at: range.lowerBound) ?? endIndex
-        return self[start..<(index(at: range.count, from: start) ?? endIndex)]
+    subscript (i: Int) -> Character {
+        return self[index(startIndex, offsetBy: i)]
     }
-    subscript(_ range: CountableClosedRange<Int>) -> Substring {
-        precondition(range.lowerBound >= 0, "lowerBound can't be negative")
-        let start = index(at: range.lowerBound) ?? endIndex
-        return self[start..<(index(at: range.count, from: start) ?? endIndex)]
+    subscript (bounds: CountableRange<Int>) -> Substring {
+        let start = index(startIndex, offsetBy: bounds.lowerBound)
+        let end = index(startIndex, offsetBy: bounds.upperBound)
+        return self[start ..< end]
     }
-    subscript(_ range: PartialRangeUpTo<Int>) -> Substring {
-        return prefix(range.upperBound)
+    subscript (bounds: CountableClosedRange<Int>) -> Substring {
+        let start = index(startIndex, offsetBy: bounds.lowerBound)
+        let end = index(startIndex, offsetBy: bounds.upperBound)
+        return self[start ... end]
     }
-    subscript(_ range: PartialRangeThrough<Int>) -> Substring {
-        return prefix(range.upperBound+1)
+    subscript (bounds: CountablePartialRangeFrom<Int>) -> Substring {
+        let start = index(startIndex, offsetBy: bounds.lowerBound)
+        let end = index(endIndex, offsetBy: -1)
+        return self[start ... end]
     }
-    subscript(_ range: PartialRangeFrom<Int>) -> Substring {
-        return suffix(max(0,count-range.lowerBound))
+    subscript (bounds: PartialRangeThrough<Int>) -> Substring {
+        let end = index(startIndex, offsetBy: bounds.upperBound)
+        return self[startIndex ... end]
+    }
+    subscript (bounds: PartialRangeUpTo<Int>) -> Substring {
+        let end = index(startIndex, offsetBy: bounds.upperBound)
+        return self[startIndex ..< end]
+    }
+}
+
+extension Substring {
+    subscript (i: Int) -> Character {
+        return self[index(startIndex, offsetBy: i)]
+    }
+    subscript (bounds: CountableRange<Int>) -> Substring {
+        let start = index(startIndex, offsetBy: bounds.lowerBound)
+        let end = index(startIndex, offsetBy: bounds.upperBound)
+        return self[start ..< end]
+    }
+    subscript (bounds: CountableClosedRange<Int>) -> Substring {
+        let start = index(startIndex, offsetBy: bounds.lowerBound)
+        let end = index(startIndex, offsetBy: bounds.upperBound)
+        return self[start ... end]
+    }
+    subscript (bounds: CountablePartialRangeFrom<Int>) -> Substring {
+        let start = index(startIndex, offsetBy: bounds.lowerBound)
+        let end = index(endIndex, offsetBy: -1)
+        return self[start ... end]
+    }
+    subscript (bounds: PartialRangeThrough<Int>) -> Substring {
+        let end = index(startIndex, offsetBy: bounds.upperBound)
+        return self[startIndex ... end]
+    }
+    subscript (bounds: PartialRangeUpTo<Int>) -> Substring {
+        let end = index(startIndex, offsetBy: bounds.upperBound)
+        return self[startIndex ..< end]
     }
 }
 

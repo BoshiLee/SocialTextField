@@ -122,12 +122,14 @@ extension SocialTextView: UITextViewDelegate {
         let isBackSpace = strcmp(char, "\\b")
         guard !self.cacheMentionRanges.isEmpty, !self.cacheTagUserRanges.isEmpty else {
             self.originText.replaceSubrange(range, withReplacementText: text)
+            self.popoverHandler(text: text)
             return true
         }
         if (isBackSpace == -92) {
             self.removeOriginText(in: range)
         } else {
             self.updateOriginText(in: range, replacementText: text)
+            self.popoverHandler(text: text)
         }
         self.setCusor(to: range.upperBound)
         return true
@@ -162,50 +164,89 @@ extension SocialTextView: UITextViewDelegate {
         self.cacheTagUserRanges = ElementBuilder.matchesMentions(form: self.originText)
     }
     
-    func cusorPositionType(isInserting: Bool) -> TypingPosisition {
-        var cusorPosistion = self.getCursorPosition()
-        if isInserting {
-            cusorPosistion = self.getCursorPosition()
-        } else {
-            cusorPosistion = self.getCursorPosition() - 1 >= 0 ? self.getCursorPosition() - 1 : 0
-        }
-        for (i, mentionRange) in self.cacheMentionRanges.enumerated() {
-            if i == 0, cusorPosistion < mentionRange.lowerBound { // 判斷是否在第一個 range 前面
-                return .leadingMentions
-            } else if (cusorPosistion > mentionRange.lowerBound && cusorPosistion < mentionRange.upperBound) { // 判斷是否在當下的 range 裡
-                return .inTheMention(mentionIndex: i)
-            } else if self.cacheMentionRanges.indices.contains(i + 1) { // 判斷是還有下一個 range
-                if cusorPosistion > mentionRange.upperBound,
-                    cusorPosistion < self.cacheMentionRanges[i + 1].lowerBound { // 在兩個 range 之間
-                    let offsetIndex = cusorPosistion - self.cacheMentionRanges[i].upperBound
-                    var tagUserOffsetIndex = self.cacheTagUserRanges[i].upperBound + offsetIndex
-                    tagUserOffsetIndex = isInserting ? tagUserOffsetIndex : tagUserOffsetIndex + 1
-                    return .betweenMention(firstIndex: i, secondIndex: i + 1, offset: tagUserOffsetIndex)
-                }
-            } else { // 後面無 range
-                
-                let offsetIndex = cusorPosistion - self.cacheMentionRanges[i].upperBound
-                let tagUserOffsetIndex = self.cacheTagUserRanges[i].upperBound + offsetIndex
-                return .trallingMentions(lastMentionIndex: i, offset: tagUserOffsetIndex)
-            }
-        }
-        // 沒有任何 ragne 時
-        return .leadingMentions
-    }
-    
     func textViewDidChange(_ textView: UITextView) {
-        self.popoverHandler(text: textView.text)
         guard !self.isTypingChineseAlpahbet() else { return }
         self.updateTextAttributed()
     }
     
 }
 
+// MARK: - Cusor Position Handler
+extension SocialTextView {
+    func cusorPositionType(isInserting: Bool) -> TypingPosisition {
+        for (i, mentionRange) in self.cacheMentionRanges.enumerated() {
+            if let markedTypingRange = self.markedTypingRange { // 有在智慧選字模式
+                guard let type = self.getCusorPosistionType(withMarkedTypingRange: markedTypingRange, Index: i, mentionRange: mentionRange, isInserting: isInserting) else {
+                    continue
+                }
+                return type
+            } else {
+                guard let type = self.getCusorPosistionType(withIndex: i, mentionRange: mentionRange, isInserting: isInserting) else {
+                    continue
+                }
+                return type
+            }
+        }
+        // 沒有任何 ragne 時
+        return .leadingMentions
+    }
+    
+    private func getCusorPosistionType(withMarkedTypingRange markedTypingRange: NSRange, Index i: Int, mentionRange: NSRange, isInserting: Bool) -> TypingPosisition? {
+        let cusorPosistion = markedTypingRange.location
+        if i == 0, cusorPosistion < mentionRange.lowerBound { // 判斷是否在第一個 range 前面
+            return .leadingMentions
+        } else if (cusorPosistion > mentionRange.lowerBound && cusorPosistion < mentionRange.upperBound) { // 判斷是否在當下的 range 裡
+            return .inTheMention(mentionIndex: i)
+        } else if self.cacheMentionRanges.indices.contains(i + 1) {
+            if (cusorPosistion > mentionRange.upperBound && cusorPosistion < self.cacheMentionRanges[i + 1].lowerBound) {
+                let offsetIndex = cusorPosistion - self.cacheMentionRanges[i].upperBound
+                var tagUserOffsetIndex = self.cacheTagUserRanges[i].upperBound + offsetIndex
+                tagUserOffsetIndex = isInserting ? tagUserOffsetIndex : tagUserOffsetIndex + 1
+                return .betweenMention(firstIndex: i, secondIndex: i + 1, offset: tagUserOffsetIndex)
+            } else {
+                return nil
+            }
+        } else { // 後面無 range
+            let offsetIndex = cusorPosistion - self.cacheMentionRanges[i].upperBound
+            let tagUserOffsetIndex = self.cacheTagUserRanges[i].upperBound + offsetIndex
+            return .trallingMentions(lastMentionIndex: i, offset: tagUserOffsetIndex)
+        }
+    }
+    
+    private func getCusorPosistionType(withIndex i: Int, mentionRange: NSRange, isInserting: Bool) -> TypingPosisition? {
+        var cusorPosistion = self.getCursorPosition()
+        if isInserting {
+            cusorPosistion = self.getCursorPosition()
+        } else {
+            cusorPosistion = cusorPosistion - 1 >= 0 ? cusorPosistion - 1 : 0
+        }
+        if i == 0, cusorPosistion < mentionRange.lowerBound { // 判斷是否在第一個 range 前面
+            return .leadingMentions
+        } else if (cusorPosistion > mentionRange.lowerBound && cusorPosistion < mentionRange.upperBound) { // 判斷是否在當下的 range 裡
+            return .inTheMention(mentionIndex: i)
+        } else if self.cacheMentionRanges.indices.contains(i + 1) {
+            // 判斷是還有下一個 range, 以及在兩個 range 之間
+            if (cusorPosistion > mentionRange.upperBound && cusorPosistion < self.cacheMentionRanges[i + 1].lowerBound) {
+                let offsetIndex = cusorPosistion - self.cacheMentionRanges[i].upperBound
+                var tagUserOffsetIndex = self.cacheTagUserRanges[i].upperBound + offsetIndex
+                tagUserOffsetIndex = isInserting ? tagUserOffsetIndex : tagUserOffsetIndex + 1
+                return .betweenMention(firstIndex: i, secondIndex: i + 1, offset: tagUserOffsetIndex)
+            } else {
+                return nil
+            }
+        } else { // 後面無 range
+            let offsetIndex = cusorPosistion - self.cacheMentionRanges[i].upperBound
+            let tagUserOffsetIndex = self.cacheTagUserRanges[i].upperBound + offsetIndex
+            return .trallingMentions(lastMentionIndex: i, offset: tagUserOffsetIndex)
+        }
+    }
+}
+
 // MARK: - Popover Handler
 extension SocialTextView {
     
     private func popoverHandler(text: String) {
-        if self.isCurrentTyping(is: "@") {
+        if text == "@" {
             if let lastMentionLocation = self.lastMentionRange?.location { //判斷是否已有 ＠
                 self.lastMentionRange = NSRange(location: lastMentionLocation, length: self.getCurrentTypingLocation())
             } else { // 沒有 ＠ 新增一個 range, 跳 popover
@@ -219,7 +260,7 @@ extension SocialTextView {
                 let newMentionLength = self.getCurrentTypingLocation() - lastMention.location + 1
                 let length = newMentionLength > 0 ? newMentionLength : 0
                 self.lastMentionRange = NSRange(location: lastMention.location, length: length)
-                self.mentionPopoverWindow?.searchMention(by: text.subString(with: lastMentionRange!))
+                self.mentionPopoverWindow?.searchMention(by: self.text.subString(with: lastMentionRange!))
             }
             self.presentPopover()
             
